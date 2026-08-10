@@ -3,7 +3,7 @@ import 'package:task_management/core/enums/project_priority.dart';
 import 'package:task_management/core/enums/project_status.dart';
 
 class ProjectEntity extends Equatable {
-  final int? id;
+  final String? id;
   final String clientName;
   final String projectName;
   final String description;
@@ -22,6 +22,35 @@ class ProjectEntity extends Equatable {
     required this.startDate,
     required this.dueDate,
   });
+
+  String getId() {
+    if (id == null) {
+      throw Exception('Project ID is null');
+    }
+    return id!;
+  }
+
+  ProjectEntity copyWith({
+    String? id,
+    String? clientName,
+    String? projectName,
+    String? description,
+    ProjectStatus? status,
+    ProjectPriority? priority,
+    DateTime? startDate,
+    DateTime? dueDate,
+  }) {
+    return ProjectEntity(
+      id: id ?? this.id,
+      clientName: clientName ?? this.clientName,
+      projectName: projectName ?? this.projectName,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      priority: priority ?? this.priority,
+      startDate: startDate ?? this.startDate,
+      dueDate: dueDate ?? this.dueDate,
+    );
+  }
 
   @override
   List<Object?> get props => [id];

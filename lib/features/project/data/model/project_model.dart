@@ -14,9 +14,22 @@ class ProjectModel extends ProjectEntity {
     required super.dueDate,
   });
 
+  factory ProjectModel.fromEntity(ProjectEntity entity) {
+    return ProjectModel(
+      id: entity.id,
+      clientName: entity.clientName,
+      projectName: entity.projectName,
+      description: entity.description,
+      status: entity.status,
+      priority: entity.priority,
+      startDate: entity.startDate,
+      dueDate: entity.dueDate,
+    );
+  }
+
   factory ProjectModel.fromJson(Map<String, dynamic> json) {
     return ProjectModel(
-      id: json['id'] as int?,
+      id: json['id'],
       clientName: json['clientName'] as String,
       projectName: json['projectName'] as String,
       description: json['description'] as String,
