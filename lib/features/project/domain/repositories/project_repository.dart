@@ -6,4 +6,5 @@ abstract class ProjectRepository {
   ResultFuture<ProjectEntity> addProject(ProjectEntity project);
   ResultFuture<ProjectEntity> updateProject(ProjectEntity project);
   ResultFuture<void> deleteProject(ProjectEntity project);
+  ResultFuture<ProjectEntity> fetchProject(String projectId);
 }
