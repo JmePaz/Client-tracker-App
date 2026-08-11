@@ -1,5 +1,23 @@
-abstract class Failure {}
+abstract class Failure {
+  final String message;
+  final String? displayMessage;
+  final int? statusCode;
 
-class LocalFailure extends Failure {}
+  Failure({required this.message, this.displayMessage, this.statusCode});
+}
 
-class APIFailure extends Failure {}
+class LocalFailure extends Failure {
+  LocalFailure({
+    required super.message,
+    super.displayMessage,
+    super.statusCode,
+  });
+}
+
+class APIFailure extends Failure {
+  APIFailure({
+    required super.message,
+    super.displayMessage,
+    required super.statusCode,
+  });
+}
