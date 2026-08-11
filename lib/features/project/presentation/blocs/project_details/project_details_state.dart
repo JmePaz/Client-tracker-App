@@ -22,6 +22,19 @@ class ProjectDetailsFetched extends ProjectDetailsState {
   List<Object> get props => [project];
 }
 
+class ProjectDetailsUpdated extends ProjectDetailsState {
+  final ProjectEntity project;
+
+  const ProjectDetailsUpdated({required this.project});
+
+  @override
+  List<Object> get props => [project];
+}
+
+class ProjectDetailsDeleted extends ProjectDetailsState {
+  const ProjectDetailsDeleted();
+}
+
 class ProjectDetailsFailed extends ProjectDetailsState {
   final Failure failure;
 

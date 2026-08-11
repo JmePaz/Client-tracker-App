@@ -85,7 +85,9 @@ class ProjectLocalDataSourceImpl extends ProjectLocalDataSource {
       if (projectData == null) {
         throw Exception('Project not found');
       }
-      return ProjectModel.fromJson(projectData);
+      return ProjectModel.fromJson(
+        Map<String, dynamic>.from(projectData as Map),
+      );
     } catch (e) {
       throw Exception('Failed to fetch project: $e');
     }

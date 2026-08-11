@@ -38,11 +38,15 @@ final router = GoRouter(
         GoRoute(
           path: ProjectDetailsScreen.routePath,
           builder: (context, state) {
+            final id = state.pathParameters['projectId'] ?? "";
+
             return BlocProvider(
-              create: (context) => sl<ProjectDetailsBloc>(),
+              create: (context) =>
+                  sl<ProjectDetailsBloc>()
+                    ..add(FetchProjectDetails(projectId: id)),
               child: AppPushedBase(
                 title: 'Project Details',
-                child: ProjectDetailsScreen(),
+                child: ProjectDetailsScreen(projectId: id),
               ),
             );
           },

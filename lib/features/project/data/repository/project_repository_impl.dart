@@ -85,13 +85,13 @@ class ProjectRepositoryImpl extends ProjectRepository {
   @override
   ResultFuture<ProjectEntity> fetchProject(String projectId) async {
     try {
-      final updatedProject = await _localDataSource.fetchProject(projectId);
-      return Right(updatedProject);
+      final fetchedProject = await _localDataSource.fetchProject(projectId);
+      return Right(fetchedProject);
     } catch (e) {
       return Left(
         LocalFailure(
           message: e.toString(),
-          displayMessage: "Failed to update project. Please try again.",
+          displayMessage: "Failed to fetch project. Please try again.",
         ),
       );
     }

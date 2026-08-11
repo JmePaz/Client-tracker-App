@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -6,12 +7,16 @@ import 'package:task_management/core/enums/project_status.dart';
 import 'package:task_management/features/project/domain/entities/project_entity.dart';
 import 'package:task_management/features/project/presentation/blocs/project_details/project_details_bloc.dart';
 import 'package:task_management/shared/alert/app_alert.dart';
+import 'package:task_management/shared/buttons/app_outline_button.dart';
 import 'package:task_management/shared/buttons/app_primary_button.dart';
 import 'package:task_management/shared/loading/app_loader_modal.dart';
 
 class ProjectDetailsScreen extends StatefulWidget {
   static const String routePath = '/project/:projectId';
-  const ProjectDetailsScreen({super.key});
+
+  final String projectId;
+
+  const ProjectDetailsScreen({super.key, required this.projectId});
 
   @override
   State<ProjectDetailsScreen> createState() => _ProjectDetailsScreenState();
@@ -24,10 +29,19 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   final _projectNameController = TextEditingController();
   final _descriptionController = TextEditingController();
 
+  late final ProjectEntity _project;
+
   ProjectStatus _status = ProjectStatus.pending;
   ProjectPriority _priority = ProjectPriority.medium;
+
   DateTime? _startDate;
   DateTime? _dueDate;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -66,7 +80,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     return null;
   }
 
-  void _submitForm() {
+  void _updateDetails() {
     if (!_formKey.currentState!.validate()) return;
     if (_startDate == null || _dueDate == null) {
       AppAlert.show(
@@ -88,6 +102,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     }
 
     final project = ProjectEntity(
+      id: widget.projectId,
       clientName: _clientNameController.text.trim(),
       projectName: _projectNameController.text.trim(),
       description: _descriptionController.text.trim(),
@@ -97,7 +112,38 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
       dueDate: _dueDate!,
     );
 
-    context.read<ProjectDetailsBloc>().add(AddProjectDetails(project: project));
+    context.read<ProjectDetailsBloc>().add(
+      UpdateProjectDetails(project: project),
+    );
+  }
+
+  void _deleteProject() {
+    AppAlert.show(
+      context: context,
+      title:
+          "Do you want to delete project ${_projectNameController.text.trim()}?",
+      message: "This action cannot be undone.",
+      type: AppAlertType.warning,
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      onConfirm: () {
+        final project = ProjectEntity(
+          id: widget.projectId,
+          clientName: _clientNameController.text.trim(),
+          projectName: _projectNameController.text.trim(),
+          description: _descriptionController.text.trim(),
+          status: _status,
+          priority: _priority,
+          startDate: _startDate!,
+          dueDate: _dueDate!,
+        );
+
+        context.read<ProjectDetailsBloc>().add(
+          DeleteProjectDetails(project: project),
+        );
+      },
+      onCancel: () {},
+    );
   }
 
   @override
@@ -107,13 +153,18 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
         if (state is ProjectDetailsLoading) {
           AppLoaderModal.show(context: context);
         } else if (state is ProjectDetailsFailed) {
+          final failure = state.failure;
+          if (kDebugMode) {
+            print(failure.message);
+          }
           AppAlert.show(
             context: context,
             title: 'Error',
-            message: 'Failed to save project.',
+            message: failure.displayMessage,
             type: AppAlertType.error,
             onConfirm: () {
               if (context.canPop()) {
+                context.pop();
                 context.pop();
               }
             },
@@ -121,10 +172,36 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
           );
         } else if (state is ProjectDetailsFetched) {
           AppLoaderModal.hide(context);
+          final project = state.project;
+          _clientNameController.text = project.clientName;
+          _projectNameController.text = project.projectName;
+          _descriptionController.text = project.description;
+          setState(() {
+            _status = project.status;
+            _priority = project.priority;
+            _startDate = project.startDate;
+            _dueDate = project.dueDate;
+          });
+        } else if (state is ProjectDetailsUpdated) {
+          AppLoaderModal.hide(context);
           AppAlert.show(
             context: context,
             title: 'Success',
-            message: 'Project saved successfully.',
+            message: 'Project updated successfully.',
+            type: AppAlertType.success,
+            onConfirm: () {
+              if (context.canPop()) {
+                context.pop();
+              }
+            },
+            barrierDismissible: false,
+          );
+        } else if (state is ProjectDetailsDeleted) {
+          AppLoaderModal.hide(context);
+          AppAlert.show(
+            context: context,
+            title: 'Success',
+            message: 'Project deleted successfully.',
             type: AppAlertType.success,
             onConfirm: () {
               if (context.canPop()) {
@@ -277,9 +354,22 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            child: AppPrimaryButton(
-              onPressed: _submitForm,
-              label: 'Create Project',
+            child: Row(
+              children: [
+                Expanded(
+                  child: AppPrimaryButton(
+                    onPressed: _updateDetails,
+                    label: 'Update',
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: AppOutlineButton(
+                    onPressed: _deleteProject,
+                    label: 'Delete',
+                  ),
+                ),
+              ],
             ),
           ),
         ],

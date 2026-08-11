@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:task_management/features/project/presentation/blocs/project_list/project_list_bloc.dart';
+import 'package:task_management/features/project/presentation/screens/project_details_screen.dart';
 import 'package:task_management/features/project/presentation/widgets/cards/project_card.dart';
 
 class ProjectListScreen extends StatelessWidget {
@@ -35,7 +37,17 @@ class ProjectListScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 8),
               itemBuilder: (context, index) {
                 final project = projects[index];
-                return ProjectCard(project: project);
+                return ProjectCard(
+                  project: project,
+                  onTap: () async {
+                    final path =
+                        "${ProjectListScreen.routePath}${ProjectDetailsScreen.routePath.replaceFirst(":projectId", project.id ?? "")}";
+                    await context.push(path);
+                    if (context.mounted) {
+                      context.read<ProjectListBloc>().add(FetchProjectList());
+                    }
+                  },
+                );
               },
             ),
           );

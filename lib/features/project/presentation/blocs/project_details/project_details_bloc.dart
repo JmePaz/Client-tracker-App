@@ -66,7 +66,7 @@ class ProjectDetailsBloc
     final result = await _updateProject(event.project);
     result.fold(
       (failure) => emit(ProjectDetailsFailed(failure: failure)),
-      (project) => emit(ProjectDetailsFetched(project: project)),
+      (project) => emit(ProjectDetailsUpdated(project: project)),
     );
   }
 
@@ -78,7 +78,7 @@ class ProjectDetailsBloc
     final result = await _deleteProject(event.project);
     result.fold(
       (failure) => emit(ProjectDetailsFailed(failure: failure)),
-      (_) => emit(ProjectDetailsFetched(project: event.project)),
+      (_) => emit(ProjectDetailsDeleted()),
     );
   }
 }
