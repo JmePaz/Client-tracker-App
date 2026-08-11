@@ -121,6 +121,12 @@ Always use `fvm flutter` instead of `flutter` to ensure the project runs with th
   * Update project details
   * View project information
   * Delete projects
+ 
+* **Clean Architecture**
+
+Structured the application into Presentation, Domain, and Data layers.
+Separates UI, business logic, and data access responsibilities.
+Improves maintainability, testability, and scalability.
 
 * **BLoC State Management**
 
